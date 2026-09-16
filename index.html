@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galaxia de Amor - Para Ti</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #030206;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            color: #ffffff;
+            user-select: none;
+        }
+
+        #webgl {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        /* Indicador de ayuda superior */
+        .instruction {
+            position: absolute;
+            top: 25px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.85);
+            text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
+            z-index: 10;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
+
+        /* Contenedor central flotante (Foto + Texto juntos) */
+        .center-container {
+            position: absolute;
+            top: 48%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        /* Marco de la imagen central */
+        .center-card {
+            width: 220px;
+            height: 220px;
+            border-radius: 20px;
+            border: 2px solid #ffffff;
+            box-shadow: 0 0 25px #ffffff, 0 0 50px rgba(255, 255, 255, 0.6);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .center-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Estilo cuando es la última escena (sin imagen central) */
+        .center-container.final-stage .center-card {
+            display: none;
+        }
+
+        /* Texto Flotante */
+        .floating-text {
+            margin-top: 18px;
+            font-size: 1.05rem;
+            font-weight: 300;
+            line-height: 1.6;
+            color: #ffffff;
+            text-align: center;
+            width: 100%;
+            padding: 16px 20px;
+            background: rgba(20, 15, 35, 0.75);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
+            animation: floatText 3s infinite ease-in-out;
+        }
+
+        .center-container.final-stage .floating-text {
+            font-size: 1.02rem;
+            line-height: 1.7;
+            color: #fbcfe8;
+            border: 1px solid rgba(236, 72, 153, 0.6);
+            box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
+            background: rgba(35, 18, 50, 0.85);
+        }
+
+        .heart-icon {
+            display: none;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.9));
+            animation: heartbeat 2s infinite ease-in-out;
+        }
+
+        .center-container.final-stage .heart-icon {
+            display: block;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.18); }
+        }
+
+        @keyframes floatText {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Animación para el desplazamiento al hacer clic */
+        .fade-out {
+            opacity: 0;
+            transform: translate(-50%, -55%) scale(0.9) !important;
+        }
+    </style>
+    <!-- Librerías Three.js para la galaxia 3D -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div class="instruction">✨ Toca en cualquier parte para avanzar ✨</div>
+    <div id="webgl"></div>
+
+    <!-- Contenedor central con la foto y su texto flotante integrados -->
+    <div class="center-container" id="centerContainer">
+        <div class="center-card" id="cardBox">
+            <img id="mainImg" src="" alt="Amor">
+        </div>
+        <div class="floating-text" id="mainText">
+            <div class="heart-icon">✨❤️✨</div>
+            <span id="textContent"></span>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. HISTORIA DE FOTOS Y MENSAJES ---
+        const history = [
+            { 
+                text: "Hola, sé que es difícil y puede no estar bien, pero perdón. No quiero dejar así las cosas, ya sé que tú dices que no se puede, pero no quiero.", 
+                img: "foto1.jpg" 
+            },
+            { 
+                text: "Esto no es para hacerte sentir mal ni nada, es solo un pequeño detalle que te quería dar. No será la gran cosa, pero es algo desde el fondo de mi corazón.", 
+                img: "foto2.jpg" 
+            },
+            { 
+                text: "Todos aquellos momentos que vivimos juntos, conocernos y enseñarnos, no quiero que nada de eso se acabe.", 
+                img: "foto3.jpg" 
+            },
+            { 
+                text: "Puede que ahorita las cosas no sean igual, pero entonces aprendamos otra vez y enseñémonos otra vez los dos.", 
+                img: "foto4.jpg" 
+            },
+            { 
+                text: "Puede ser egoísta de mi parte, pero no quiero que nada de esto se acabe: los pequeños y grandes detalles, las salidas y todo lo que llegamos a vivir juntos.", 
+                img: "foto5.jpg" 
+            },
+            { 
+                text: "Un viaje como este puede que no haya sido el mejor, pero fue una gran experiencia, nuestro primer viaje juntos, y quiero que hayan muchos más viajes así.", 
+                img: "foto6.jpg" 
+            },
+            { 
+                text: "Yo sé que es difícil y como tú dices ya no me amas como antes, pero déjame demostrarte que los dos podemos mejorar y te volveré a enamorar día tras día.", 
+                img: "foto7.jpg" 
+            },
+            { 
+                text: "Puede que las cosas no vayan a ser iguales, ¿pero qué importa? Hagamos nuestra propia historia y lo más importante: estemos juntos, aprendamos más uno del otro y de la vida, mejoremos.", 
+                img: "foto8.jpg" 
+            },
+            { 
+                text: "No sé si esto te haga cambiar de opinión o si hayas logrado pensar bien las cosas, pero yo no quiero que esto quede así. No dejemos que acabe así. Puede que me hayas dicho que ya no lo quieres intentar por lo anterior, pero ¿enserio es lo que quieres?, ¿sí pensaste bien lo que tú querías?, ¿por qué no avanzar los dos y descubrir más cosas los dos? Te amo mucho muchote.", 
+                img: "foto9.jpg" 
+            },
+            { 
+                // Mensaje final (sin imagen central)
+                text: "Y desde el fondo de mi corazón, puede que yo no sea el mejor hombre, novio y todo lo que pueda ser, pero nada es perfecto, solo tenemos que aprender y mejorar. Puede que no tenga el amor propio que necesito, pero es algo complicado y pues para un hombre es normal no tener casi amor propio, uno no quiere hacer las cosas por uno mismo, y sí, eso se puede cambiar, pero no es sencillo. Es más sencillo cuando uno cambia por alguien importante para uno y así ya está mejorando para sí mismo y empezará a mejorar más por sí mismo también. Entonces, déjame aprender a tu lado.", 
+                img: null 
+            }
+        ];
+
+        let currentIndex = 0;
+        const mainImg = document.getElementById('mainImg');
+        const textContent = document.getElementById('textContent');
+        const centerContainer = document.getElementById('centerContainer');
+
+        // Cargar contenido activo según el índice
+        function updateContent() {
+            const currentItem = history[currentIndex];
+            
+            if (currentItem.img) {
+                centerContainer.classList.remove('final-stage');
+                mainImg.src = currentItem.img;
+            } else {
+                centerContainer.classList.add('final-stage');
+            }
+            
+            textContent.innerText = currentItem.text;
+        }
+        updateContent();
+
+        // Al hacer clic en la pantalla avanza la historia
+        window.addEventListener('click', () => {
+            centerContainer.classList.add('fade-out');
+
+            setTimeout(() => {
+                currentIndex = (currentIndex + 1) % history.length;
+                updateContent();
+                centerContainer.classList.remove('fade-out');
+            }, 350);
+        });
+
+        // --- 2. ESCENA 3D EN BLANCO Y GALAXIA ---
+        const scene = new THREE.Scene();
+        scene.fog = new THREE.FogExp2(0x030206, 0.012);
+
+        const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 8, 25);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
+        document.getElementById('webgl').appendChild(renderer.domElement);
+
+        const controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.05;
+        controls.enableZoom = false;
+
+        // --- 3. GALAXIA DE ESTRELLAS BLANCAS Y CORAZÓN 3D ---
+        function createWhiteGalaxy() {
+            const count = 6500;
+            const geometry = new THREE.BufferGeometry();
+            const positions = new Float32Array(count * 3);
+            const colors = new Float32Array(count * 3);
+
+            const whiteColor = new THREE.Color('#ffffff');
+
+            for (let i = 0; i < count; i++) {
+                if (i < count / 2) {
+                    // Corazón arriba
+                    const t = Math.random() * Math.PI * 2;
+                    let x = 16 * Math.pow(Math.sin(t), 3);
+                    let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
+                    
+                    const scale = 0.38;
+                    positions[i * 3] = x * scale + (Math.random() - 0.5) * 1.2;
+                    positions[i * 3 + 1] = y * scale + 6 + (Math.random() - 0.5) * 1.2;
+                    positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
+                } else {
+                    // Espiral galáctica en la base
+                    const radius = Math.random() * 20;
+                    const spinAngle = radius * 0.8;
+                    const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
+
+                    const randomX = (Math.random() - 0.5) * 1.2;
+                    const randomY = (Math.random() - 0.5) * 1.2;
+                    const randomZ = (Math.random() - 0.5) * 1.2;
+
+                    positions[i * 3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
+                    positions[i * 3 + 1] = -4 + randomY + (Math.random() - 0.5) * 2;
+                    positions[i * 3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+                }
+
+                colors[i * 3] = whiteColor.r;
+                colors[i * 3 + 1] = whiteColor.g;
+                colors[i * 3 + 2] = whiteColor.b;
+            }
+
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.13,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.9,
+                blending: THREE.AdditiveBlending
+            });
+
+            return new THREE.Points(geometry, material);
+        }
+
+        const galaxyPoints = createWhiteGalaxy();
+        scene.add(galaxyPoints);
+
+        // --- 4. FOTOS FLOTANTES Y GIRANDO EN LA ÓRBITA 3D ---
+        const groupPhotos = new THREE.Group();
+        scene.add(groupPhotos);
+
+        const textureLoader = new THREE.TextureLoader();
+        const photoMeshes = [];
+        const radiusRing = 13;
+
+        // Lista de fotos a mostrar girando en el espacio
+        const photoItems = history.filter(item => item.img !== null);
+
+        photoItems.forEach((item, index) => {
+            const angle = (index / photoItems.length) * Math.PI * 2;
+            const geometry = new THREE.PlaneGeometry(2.8, 2.8);
+            
+            // Material inicial translúcido para asegurar visibilidad en la galaxia
+            const material = new THREE.MeshBasicMaterial({
+                color: 0xffffff,
+                side: THREE.DoubleSide,
+                transparent: true,
+                opacity: 0.85
+            });
+
+            const mesh = new THREE.Mesh(geometry, material);
+
+            mesh.position.x = Math.cos(angle) * radiusRing;
+            mesh.position.z = Math.sin(angle) * radiusRing;
+            mesh.position.y = Math.sin(index) * 1.8;
+
+            mesh.lookAt(0, mesh.position.y, 0);
+            mesh.userData = { originalY: mesh.position.y };
+
+            // Se asigna la textura al cargar el archivo de la foto
+            textureLoader.load(item.img, (texture) => {
+                mesh.material.map = texture;
+                mesh.material.needsUpdate = true;
+            });
+
+            groupPhotos.add(mesh);
+            photoMeshes.push(mesh);
+        });
+
+        // --- 5. ANIMACIÓN Y ROTACIÓN CONTINUA ---
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotación constante de la galaxia y del anillo de fotos flotantes
+            galaxyPoints.rotation.y += 0.0018;
+            groupPhotos.rotation.y += 0.0022;
+
+            // Movimiento suave de flotación vertical en cada foto
+            const time = Date.now() * 0.0015;
+            photoMeshes.forEach((mesh, i) => {
+                mesh.position.y = mesh.userData.originalY + Math.sin(time + i) * 0.35;
+            });
+
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        animate();
+
+        // Ajuste en cambio de tamaño de pantalla
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
