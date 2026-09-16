@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Galaxia de Amor - Para Ti</title>
+    <title>Galaxia de Girasoles y Flores - Para Ti</title>
     <style>
         * {
             margin: 0;
@@ -100,17 +100,17 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 25px rgba(168, 85, 247, 0.3);
+            box-shadow: 0 0 25px rgba(234, 179, 8, 0.3);
             animation: floatText 3s infinite ease-in-out;
         }
 
         .center-container.final-stage .floating-text {
             font-size: 1.02rem;
             line-height: 1.7;
-            color: #fbcfe8;
-            border: 1px solid rgba(236, 72, 153, 0.6);
-            box-shadow: 0 0 30px rgba(236, 72, 153, 0.4);
-            background: rgba(35, 18, 50, 0.85);
+            color: #fef08a;
+            border: 1px solid rgba(234, 179, 8, 0.8);
+            box-shadow: 0 0 30px rgba(234, 179, 8, 0.5);
+            background: rgba(35, 25, 10, 0.85);
         }
 
         .heart-icon {
@@ -118,7 +118,7 @@
             font-size: 2.2rem;
             margin-bottom: 10px;
             text-align: center;
-            filter: drop-shadow(0 0 10px rgba(236, 72, 153, 0.9));
+            filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.9));
             animation: heartbeat 2s infinite ease-in-out;
         }
 
@@ -136,7 +136,6 @@
             50% { transform: translateY(-6px); }
         }
 
-        /* Animación para el desplazamiento al hacer clic */
         .fade-out {
             opacity: 0;
             transform: translate(-50%, -55%) scale(0.9) !important;
@@ -157,7 +156,7 @@
             <img id="mainImg" src="" alt="Amor">
         </div>
         <div class="floating-text" id="mainText">
-            <div class="heart-icon">✨❤️✨</div>
+            <div class="heart-icon">🌻💛🌻</div>
             <span id="textContent"></span>
         </div>
     </div>
@@ -202,7 +201,6 @@
                 img: "foto9.jpeg" 
             },
             { 
-                // Mensaje final (sin imagen central)
                 text: "Y desde el fondo de mi corazón, puede que yo no sea el mejor hombre, novio y todo lo que pueda ser, pero nada es perfecto, solo tenemos que aprender y mejorar. Puede que no tenga el amor propio que necesito, pero es algo complicado y pues para un hombre es normal no tener casi amor propio, uno no quiere hacer las cosas por uno mismo, y sí, eso se puede cambiar, pero no es sencillo. Es más sencillo cuando uno cambia por alguien importante para uno y así ya está mejorando para sí mismo y empezará a mejorar más por sí mismo también. Entonces, déjame aprender a tu lado.", 
                 img: null 
             }
@@ -213,7 +211,6 @@
         const textContent = document.getElementById('textContent');
         const centerContainer = document.getElementById('centerContainer');
 
-        // Cargar contenido activo según el índice
         function updateContent() {
             const currentItem = history[currentIndex];
             
@@ -228,7 +225,6 @@
         }
         updateContent();
 
-        // Al hacer clic en la pantalla avanza la historia
         window.addEventListener('click', () => {
             centerContainer.classList.add('fade-out');
 
@@ -239,7 +235,7 @@
             }, 350);
         });
 
-        // --- 2. ESCENA 3D EN BLANCO Y GALAXIA ---
+        // --- 2. ESCENA 3D ---
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x030206, 0.012);
 
@@ -256,117 +252,195 @@
         controls.dampingFactor = 0.05;
         controls.enableZoom = false;
 
-        // --- 3. GALAXIA DE ESTRELLAS BLANCAS Y CORAZÓN 3D ---
-        function createWhiteGalaxy() {
+        // --- 3. GALAXIA DE ESTRELLAS CÁLIDAS ---
+        function createGalaxy() {
             const count = 6500;
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(count * 3);
             const colors = new Float32Array(count * 3);
-
-            const whiteColor = new THREE.Color('#ffffff');
+            
+            const colorYellow = new THREE.Color('#fef08a');
+            const colorWhite = new THREE.Color('#ffffff');
 
             for (let i = 0; i < count; i++) {
                 if (i < count / 2) {
-                    // Corazón arriba
                     const t = Math.random() * Math.PI * 2;
                     let x = 16 * Math.pow(Math.sin(t), 3);
                     let y = 13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t);
-                    
                     const scale = 0.38;
                     positions[i * 3] = x * scale + (Math.random() - 0.5) * 1.2;
                     positions[i * 3 + 1] = y * scale + 6 + (Math.random() - 0.5) * 1.2;
                     positions[i * 3 + 2] = (Math.random() - 0.5) * 2;
                 } else {
-                    // Espiral galáctica en la base
                     const radius = Math.random() * 20;
                     const spinAngle = radius * 0.8;
                     const branchAngle = ((i % 3) * 2 * Math.PI) / 3;
 
-                    const randomX = (Math.random() - 0.5) * 1.2;
-                    const randomY = (Math.random() - 0.5) * 1.2;
-                    const randomZ = (Math.random() - 0.5) * 1.2;
-
-                    positions[i * 3] = Math.cos(branchAngle + spinAngle) * radius + randomX;
-                    positions[i * 3 + 1] = -4 + randomY + (Math.random() - 0.5) * 2;
-                    positions[i * 3 + 2] = Math.sin(branchAngle + spinAngle) * radius + randomZ;
+                    positions[i * 3] = Math.cos(branchAngle + spinAngle) * radius + (Math.random() - 0.5) * 1.2;
+                    positions[i * 3 + 1] = -4 + (Math.random() - 0.5) * 2;
+                    positions[i * 3 + 2] = Math.sin(branchAngle + spinAngle) * radius + (Math.random() - 0.5) * 1.2;
                 }
 
-                colors[i * 3] = whiteColor.r;
-                colors[i * 3 + 1] = whiteColor.g;
-                colors[i * 3 + 2] = whiteColor.b;
+                const mixedColor = Math.random() > 0.4 ? colorYellow : colorWhite;
+                colors[i * 3] = mixedColor.r;
+                colors[i * 3 + 1] = mixedColor.g;
+                colors[i * 3 + 2] = mixedColor.b;
             }
 
             geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
             geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
 
-            const material = new THREE.PointsMaterial({
+            return new THREE.Points(geometry, new THREE.PointsMaterial({
                 size: 0.13,
                 vertexColors: true,
                 transparent: true,
                 opacity: 0.9,
                 blending: THREE.AdditiveBlending
-            });
-
-            return new THREE.Points(geometry, material);
+            }));
         }
 
-        const galaxyPoints = createWhiteGalaxy();
+        const galaxyPoints = createGalaxy();
         scene.add(galaxyPoints);
 
-        // --- 4. FOTOS FLOTANTES Y GIRANDO EN LA ÓRBITA 3D ---
+        // --- 4. CREADOR DE TEXTURA DE GIRASOL REAL (CANVAS 2D DIBUJADO A DETALLE) ---
+        function generateSunflowerTexture(type = 'sunflower') {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            const cx = 256;
+            const cy = 256;
+
+            if (type === 'sunflower') {
+                // Pétalos Amarillos Dorados
+                const petals = 28;
+                for (let i = 0; i < petals; i++) {
+                    const angle = (i / petals) * Math.PI * 2;
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(angle);
+
+                    // Gradiente de pétalo
+                    const grad = ctx.createLinearGradient(0, 0, 0, -220);
+                    grad.addColorStop(0, '#f59e0b');
+                    grad.addColorStop(0.5, '#fbbf24');
+                    grad.addColorStop(1, '#fef08a');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -40);
+                    ctx.quadraticCurveTo(35, -130, 0, -230);
+                    ctx.quadraticCurveTo(-35, -130, 0, -40);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // Centro Marrón con textura de Semillas
+                const centerGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 75);
+                centerGrad.addColorStop(0, '#271202');
+                centerGrad.addColorStop(0.7, '#451a03');
+                centerGrad.addColorStop(1, '#78350f');
+
+                ctx.fillStyle = centerGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 75, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Puntos de semillas del girasol
+                ctx.fillStyle = '#fbbf24';
+                for (let j = 0; j < 120; j++) {
+                    const r = Math.sqrt(j) * 6.5;
+                    const theta = j * 137.5 * (Math.PI / 180);
+                    const x = cx + r * Math.cos(theta);
+                    const y = cy + r * Math.sin(theta);
+                    ctx.beginPath();
+                    ctx.arc(x, y, 2.5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            } else {
+                // Margarita Blanca con Centro Amarillo
+                const petals = 24;
+                for (let i = 0; i < petals; i++) {
+                    const angle = (i / petals) * Math.PI * 2;
+                    ctx.save();
+                    ctx.translate(cx, cy);
+                    ctx.rotate(angle);
+
+                    const grad = ctx.createLinearGradient(0, 0, 0, -210);
+                    grad.addColorStop(0, '#e2e8f0');
+                    grad.addColorStop(1, '#ffffff');
+
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.moveTo(0, -35);
+                    ctx.quadraticCurveTo(28, -120, 0, -220);
+                    ctx.quadraticCurveTo(-28, -120, 0, -35);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // Centro amarillo brillante
+                const centerGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, 55);
+                centerGrad.addColorStop(0, '#fef08a');
+                centerGrad.addColorStop(0.8, '#eab308');
+                centerGrad.addColorStop(1, '#ca8a04');
+
+                ctx.fillStyle = centerGrad;
+                ctx.beginPath();
+                ctx.arc(cx, cy, 55, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            return new THREE.CanvasTexture(canvas);
+        }
+
+        // --- 5. AÑADIR GIRASOLES Y FLORES EN ÓRBITA ---
         const groupPhotos = new THREE.Group();
         scene.add(groupPhotos);
 
-        const textureLoader = new THREE.TextureLoader();
         const photoMeshes = [];
         const radiusRing = 13;
+        const totalFlowers = 10;
 
-        // Lista de fotos a mostrar girando en el espacio
-        const photoItems = history.filter(item => item.img !== null);
+        const textureSunflower = generateSunflowerTexture('sunflower');
+        const textureDaisy = generateSunflowerTexture('daisy');
 
-        photoItems.forEach((item, index) => {
-            const angle = (index / photoItems.length) * Math.PI * 2;
-            const geometry = new THREE.PlaneGeometry(2.8, 2.8);
-            
-            // Material inicial translúcido para asegurar visibilidad en la galaxia
+        for (let index = 0; index < totalFlowers; index++) {
+            const angle = (index / totalFlowers) * Math.PI * 2;
+            const geometry = new THREE.PlaneGeometry(3.5, 3.5);
+
+            const texture = index % 3 === 0 ? textureDaisy : textureSunflower;
+
             const material = new THREE.MeshBasicMaterial({
-                color: 0xffffff,
+                map: texture,
                 side: THREE.DoubleSide,
                 transparent: true,
-                opacity: 0.85
+                opacity: 0.95
             });
 
             const mesh = new THREE.Mesh(geometry, material);
-
             mesh.position.x = Math.cos(angle) * radiusRing;
             mesh.position.z = Math.sin(angle) * radiusRing;
             mesh.position.y = Math.sin(index) * 1.8;
-
             mesh.lookAt(0, mesh.position.y, 0);
             mesh.userData = { originalY: mesh.position.y };
 
-            // Se asigna la textura al cargar el archivo de la foto
-            textureLoader.load(item.img, (texture) => {
-                mesh.material.map = texture;
-                mesh.material.needsUpdate = true;
-            });
-
             groupPhotos.add(mesh);
             photoMeshes.push(mesh);
-        });
+        }
 
-        // --- 5. ANIMACIÓN Y ROTACIÓN CONTINUA ---
+        // --- 6. ANIMACIÓN ---
         function animate() {
             requestAnimationFrame(animate);
 
-            // Rotación constante de la galaxia y del anillo de fotos flotantes
             galaxyPoints.rotation.y += 0.0018;
             groupPhotos.rotation.y += 0.0022;
 
-            // Movimiento suave de flotación vertical en cada foto
             const time = Date.now() * 0.0015;
             photoMeshes.forEach((mesh, i) => {
                 mesh.position.y = mesh.userData.originalY + Math.sin(time + i) * 0.35;
+                mesh.rotation.z += 0.003; // Rotación suave de los girasoles
             });
 
             controls.update();
@@ -375,7 +449,6 @@
 
         animate();
 
-        // Ajuste en cambio de tamaño de pantalla
         window.addEventListener('resize', () => {
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
