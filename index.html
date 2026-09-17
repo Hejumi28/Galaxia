@@ -45,6 +45,33 @@
             text-transform: uppercase;
         }
 
+        /* Botón de control de audio en la esquina */
+        .music-btn {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            z-index: 20;
+            background: rgba(20, 15, 35, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #fff;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:hover {
+            transform: scale(1.1);
+            border-color: #fef08a;
+        }
+
         /* Contenedor central flotante (Foto + Texto juntos) */
         .center-container {
             position: absolute;
@@ -150,6 +177,12 @@
     <div class="instruction">✨ Toca en cualquier parte para avanzar ✨</div>
     <div id="webgl"></div>
 
+    <!-- Etiqueta de audio oculta -->
+    <audio id="bgMusic" src="faltas_tu.mp3"></audio>
+
+    <!-- Botón para pausar/reproducir música -->
+    <button class="music-btn" id="musicBtn" title="Activar/Desactivar música">🎵</button>
+
     <!-- Contenedor central con la foto y su texto flotante integrados -->
     <div class="center-container" id="centerContainer">
         <div class="center-card" id="cardBox">
@@ -162,6 +195,57 @@
     </div>
 
     <script>
+        // --- CONTROL DE REPRODUCCIÓN CONTINUA DE LAS DOS CANCIONES ---
+        const playlist = [
+            "faltas_tu.mp3",
+            "porfa_no_te_vayas.mp3"
+        ];
+        let currentSongIndex = 0;
+
+        const bgMusic = document.getElementById('bgMusic');
+        const musicBtn = document.getElementById('musicBtn');
+        let isMusicPlaying = false;
+
+        function loadAndPlaySong(index) {
+            bgMusic.src = playlist[index];
+            bgMusic.play().then(() => {
+                musicBtn.innerText = '🎵';
+                isMusicPlaying = true;
+            }).catch(err => {
+                console.log("Esperando interacción del usuario...");
+            });
+        }
+
+        // Cuando termina una canción, pasa automáticamente a la siguiente
+        bgMusic.addEventListener('ended', () => {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+            loadAndPlaySong(currentSongIndex);
+        });
+
+        function toggleMusic() {
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                musicBtn.innerText = '🔇';
+                isMusicPlaying = false;
+            } else {
+                if (!bgMusic.src || bgMusic.src === "") {
+                    loadAndPlaySong(currentSongIndex);
+                } else {
+                    bgMusic.play().then(() => {
+                        musicBtn.innerText = '🎵';
+                        isMusicPlaying = true;
+                    }).catch(err => {
+                        console.log("Esperando interacción del usuario...");
+                    });
+                }
+            }
+        }
+
+        musicBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Evita avanzar de foto al tocar el botón de música
+            toggleMusic();
+        });
+
         // --- 1. HISTORIA DE FOTOS Y MENSAJES ---
         const history = [
             { 
@@ -226,6 +310,11 @@
         updateContent();
 
         window.addEventListener('click', () => {
+            // Iniciar reproducción de la música en la primera interacción si no está sonando
+            if (!isMusicPlaying) {
+                toggleMusic();
+            }
+
             centerContainer.classList.add('fade-out');
 
             setTimeout(() => {
@@ -313,7 +402,6 @@
             const cy = 256;
 
             if (type === 'sunflower') {
-                // Pétalos Amarillos Dorados
                 const petals = 28;
                 for (let i = 0; i < petals; i++) {
                     const angle = (i / petals) * Math.PI * 2;
@@ -321,7 +409,6 @@
                     ctx.translate(cx, cy);
                     ctx.rotate(angle);
 
-                    // Gradiente de pétalo
                     const grad = ctx.createLinearGradient(0, 0, 0, -220);
                     grad.addColorStop(0, '#f59e0b');
                     grad.addColorStop(0.5, '#fbbf24');
@@ -336,7 +423,6 @@
                     ctx.restore();
                 }
 
-                // Centro Marrón con textura de Semillas
                 const centerGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 75);
                 centerGrad.addColorStop(0, '#271202');
                 centerGrad.addColorStop(0.7, '#451a03');
@@ -347,7 +433,6 @@
                 ctx.arc(cx, cy, 75, 0, Math.PI * 2);
                 ctx.fill();
 
-                // Puntos de semillas del girasol
                 ctx.fillStyle = '#fbbf24';
                 for (let j = 0; j < 120; j++) {
                     const r = Math.sqrt(j) * 6.5;
@@ -359,7 +444,6 @@
                     ctx.fill();
                 }
             } else {
-                // Margarita Blanca con Centro Amarillo
                 const petals = 24;
                 for (let i = 0; i < petals; i++) {
                     const angle = (i / petals) * Math.PI * 2;
@@ -380,7 +464,6 @@
                     ctx.restore();
                 }
 
-                // Centro amarillo brillante
                 const centerGrad = ctx.createRadialGradient(cx, cy, 5, cx, cy, 55);
                 centerGrad.addColorStop(0, '#fef08a');
                 centerGrad.addColorStop(0.8, '#eab308');
@@ -440,7 +523,7 @@
             const time = Date.now() * 0.0015;
             photoMeshes.forEach((mesh, i) => {
                 mesh.position.y = mesh.userData.originalY + Math.sin(time + i) * 0.35;
-                mesh.rotation.z += 0.003; // Rotación suave de los girasoles
+                mesh.rotation.z += 0.003;
             });
 
             controls.update();
