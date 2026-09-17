@@ -86,7 +86,7 @@
             justify-content: center;
             z-index: 10;
             pointer-events: none;
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.35s ease, transform 0.35s ease;
             width: 90%;
             max-width: 420px;
         }
@@ -100,12 +100,14 @@
             box-shadow: 0 0 25px #ffffff, 0 0 50px rgba(255, 255, 255, 0.6);
             overflow: hidden;
             transition: all 0.3s ease;
+            background-color: #000;
         }
 
         .center-card img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
 
         /* Estilo cuando es la última escena (sin imagen central) */
@@ -131,7 +133,7 @@
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
             box-shadow: 0 0 25px rgba(234, 179, 8, 0.3);
             animation: floatText 3s infinite ease-in-out;
-            max-height: 50vh;
+            max-height: 45vh;
             overflow-y: auto;
         }
 
@@ -190,7 +192,7 @@
     <!-- Contenedor central con la foto y su texto flotante integrados -->
     <div class="center-container" id="centerContainer">
         <div class="center-card" id="cardBox">
-            <img id="mainImg" src="" alt="Amor">
+            <img id="mainImg" src="foto1.jpeg" alt="Foto de recuerdo">
         </div>
         <div class="floating-text" id="mainText">
             <div class="heart-icon">🌻💛🌻</div>
@@ -220,7 +222,6 @@
             });
         }
 
-        // Cuando termina una canción, pasa automáticamente a la siguiente
         bgMusic.addEventListener('ended', () => {
             currentSongIndex = (currentSongIndex + 1) % playlist.length;
             loadAndPlaySong(currentSongIndex);
@@ -249,8 +250,9 @@
             e.stopPropagation();
             toggleMusic();
         });
-        musicBtn.addEventListener('touchstart', (e) => {
+        musicBtn.addEventListener('touchend', (e) => {
             e.stopPropagation();
+            toggleMusic();
         });
 
         // --- 1. HISTORIA DE FOTOS Y MENSAJES ---
@@ -305,25 +307,31 @@
         function updateContent() {
             const currentItem = history[currentIndex];
             
-            if (currentItem.img) {
+            if (currentItem.img !== null) {
                 centerContainer.classList.remove('final-stage');
-                mainImg.src = currentItem.img;
+                // Asignamos explícitamente el nombre de la imagen actual
+                mainImg.setAttribute('src', currentItem.img);
             } else {
                 centerContainer.classList.add('final-stage');
             }
             
             textContent.innerText = currentItem.text;
         }
+
+        // Carga inicial
         updateContent();
 
-        let isAdvancing = false;
-        function handleAdvance(e) {
-            if (e.target === musicBtn || musicBtn.contains(e.target)) return;
-            if (isAdvancing) return;
+        let isTransitioning = false;
+        function advanceStory(e) {
+            // Evitar que el toque del botón de música avance las diapositivas
+            if (e && (e.target === musicBtn || musicBtn.contains(e.target))) {
+                return;
+            }
 
-            isAdvancing = true;
+            if (isTransitioning) return;
+            isTransitioning = true;
 
-            // Iniciar reproducción de la música en la primera interacción
+            // Iniciar música en la primera interacción si está pausada
             if (!isMusicPlaying) {
                 toggleMusic();
             }
@@ -334,13 +342,15 @@
                 currentIndex = (currentIndex + 1) % history.length;
                 updateContent();
                 centerContainer.classList.remove('fade-out');
-                isAdvancing = false;
+                
+                setTimeout(() => {
+                    isTransitioning = false;
+                }, 200);
             }, 350);
         }
 
-        // Soporte para toque en pantalla táctil y clic en PC
-        window.addEventListener('touchend', handleAdvance, false);
-        window.addEventListener('click', handleAdvance, false);
+        // Eventos unificados para PC y celulares
+        window.addEventListener('click', advanceStory);
 
         // --- 2. ESCENA 3D ---
         const scene = new THREE.Scene();
