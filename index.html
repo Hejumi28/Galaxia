@@ -86,7 +86,7 @@
             justify-content: center;
             z-index: 10;
             pointer-events: none;
-            transition: opacity 0.35s ease, transform 0.35s ease;
+            transition: opacity 0.3s ease, transform 0.3s ease;
             width: 90%;
             max-width: 420px;
         }
@@ -100,7 +100,7 @@
             box-shadow: 0 0 25px #ffffff, 0 0 50px rgba(255, 255, 255, 0.6);
             overflow: hidden;
             transition: all 0.3s ease;
-            background-color: #000;
+            background-color: #030206;
         }
 
         .center-card img {
@@ -246,11 +246,7 @@
             }
         }
 
-        musicBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            toggleMusic();
-        });
-        musicBtn.addEventListener('touchend', (e) => {
+        musicBtn.addEventListener('pointerdown', (e) => {
             e.stopPropagation();
             toggleMusic();
         });
@@ -299,6 +295,14 @@
             }
         ];
 
+        // Precargar todas las imágenes para evitar demoras o bloqueos al cambiar
+        history.forEach(item => {
+            if (item.img) {
+                const imgPreload = new Image();
+                imgPreload.src = item.img;
+            }
+        });
+
         let currentIndex = 0;
         const mainImg = document.getElementById('mainImg');
         const textContent = document.getElementById('textContent');
@@ -309,8 +313,7 @@
             
             if (currentItem.img !== null) {
                 centerContainer.classList.remove('final-stage');
-                // Asignamos explícitamente el nombre de la imagen actual
-                mainImg.setAttribute('src', currentItem.img);
+                mainImg.src = currentItem.img;
             } else {
                 centerContainer.classList.add('final-stage');
             }
@@ -323,7 +326,7 @@
 
         let isTransitioning = false;
         function advanceStory(e) {
-            // Evitar que el toque del botón de música avance las diapositivas
+            // Evita que el toque sobre el botón de música cambie de foto
             if (e && (e.target === musicBtn || musicBtn.contains(e.target))) {
                 return;
             }
@@ -331,7 +334,6 @@
             if (isTransitioning) return;
             isTransitioning = true;
 
-            // Iniciar música en la primera interacción si está pausada
             if (!isMusicPlaying) {
                 toggleMusic();
             }
@@ -345,12 +347,12 @@
                 
                 setTimeout(() => {
                     isTransitioning = false;
-                }, 200);
-            }, 350);
+                }, 150);
+            }, 300);
         }
 
-        // Eventos unificados para PC y celulares
-        window.addEventListener('click', advanceStory);
+        // Evento unificado universal para touch y mouse
+        window.addEventListener('pointerdown', advanceStory);
 
         // --- 2. ESCENA 3D ---
         const scene = new THREE.Scene();
