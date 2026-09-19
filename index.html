@@ -238,7 +238,7 @@
     <div id="webgl"></div>
 
     <!-- Etiqueta de audio oculta -->
-    <audio id="bgMusic" src="faltas_tu.mp3" playsinline></audio>
+    <audio id="bgMusic" playsinline></audio>
 
     <!-- Botón para pausar/reproducir música -->
     <button class="music-btn" id="musicBtn" title="Activar/Desactivar música">🎵</button>
@@ -258,49 +258,62 @@
     </div>
 
     <script>
-        // --- CONTROL DE REPRODUCCIÓN CONTINUA DE CANCIONES ---
-        const playlist = [
-            "faltas_tu.mp3",
-            "porfa_no_te_vayas.mp3"
-        ];
-        let currentSongIndex = 0;
-
+        // --- CONTROL DE AUDIO POR ETAPAS ---
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
         const nextBtn = document.getElementById('nextBtn');
+        
         let isMusicPlaying = false;
+        let currentStage = 1; // Stage 1 (índices 0-4), Stage 2 (índices 5+)
+        let stage2Index = 0;   // Transición entre faltas_tu.mp3 y porfa_no_te_vayas.mp3
+
+        const songStage1 = "aprender_a_quererte.mp3";
+        const playlistStage2 = [
+            "faltas_tu.mp3",
+            "porfa_no_te_vayas.mp3"
+        ];
 
         bgMusic.volume = 0.3;
 
-        function loadAndPlaySong(index) {
-            bgMusic.src = playlist[index];
+        // Cargar y reproducir una pista según la etapa
+        function playSong(src) {
+            bgMusic.src = src;
             bgMusic.volume = 0.3;
-            bgMusic.play().then(() => {
-                musicBtn.innerText = '🎵';
-                isMusicPlaying = true;
-            }).catch(err => {
-                console.log("Esperando interacción del usuario...");
-            });
+            if (isMusicPlaying) {
+                bgMusic.play().then(() => {
+                    musicBtn.innerText = '🎵';
+                }).catch(err => {
+                    console.log("Esperando interacción del usuario para audio...");
+                });
+            }
         }
 
+        // Manejador del fin de cada canción
         bgMusic.addEventListener('ended', () => {
-            currentSongIndex = (currentSongIndex + 1) % playlist.length;
-            loadAndPlaySong(currentSongIndex);
+            if (currentStage === 1) {
+                // Etapa 1: Repetir en bucle la canción de la etapa 1
+                playSong(songStage1);
+            } else {
+                // Etapa 2: Alternar en bucle entre las canciones de la lista 2
+                stage2Index = (stage2Index + 1) % playlistStage2.length;
+                playSong(playlistStage2[stage2Index]);
+            }
         });
 
+        // Alternar reproducción / pausa
         function toggleMusic() {
             if (isMusicPlaying) {
                 bgMusic.pause();
                 musicBtn.innerText = '🔇';
                 isMusicPlaying = false;
             } else {
+                isMusicPlaying = true;
                 if (!bgMusic.src || bgMusic.src === "" || bgMusic.src.endsWith("undefined")) {
-                    loadAndPlaySong(currentSongIndex);
+                    checkAndManageMusicStage(currentIndex, true);
                 } else {
                     bgMusic.volume = 0.3;
                     bgMusic.play().then(() => {
                         musicBtn.innerText = '🎵';
-                        isMusicPlaying = true;
                     }).catch(err => {
                         console.log("Esperando interacción del usuario...");
                     });
@@ -371,6 +384,21 @@
         const centerContainer = document.getElementById('centerContainer');
         const mainText = document.getElementById('mainText');
 
+        // Evalúa la posición de la historia para cambiar la lista de canciones si corresponde
+        function checkAndManageMusicStage(index, forcePlay = false) {
+            const requiredStage = index < 5 ? 1 : 2;
+
+            if (requiredStage !== currentStage || forcePlay || !bgMusic.src) {
+                currentStage = requiredStage;
+                if (currentStage === 1) {
+                    playSong(songStage1);
+                } else {
+                    stage2Index = 0;
+                    playSong(playlistStage2[stage2Index]);
+                }
+            }
+        }
+
         function updateContent() {
             const currentItem = history[currentIndex];
             
@@ -383,6 +411,9 @@
             
             textContent.innerText = currentItem.text;
             mainText.scrollTop = 0;
+
+            // Verificar si debe cambiar de canción según el índice
+            checkAndManageMusicStage(currentIndex);
         }
 
         updateContent();
@@ -393,7 +424,7 @@
             isTransitioning = true;
 
             if (!isMusicPlaying) {
-                toggleMusic();
+                isMusicPlaying = true;
             }
 
             centerContainer.classList.add('fade-out');
