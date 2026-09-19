@@ -32,19 +32,41 @@
             z-index: 1;
         }
 
-        /* Indicador de ayuda superior */
-        .instruction {
+        /* Contenedor del indicador de ayuda superior */
+        .instruction-container {
             position: absolute;
-            top: 25px;
+            top: 15px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            z-index: 10;
+            pointer-events: none;
+            padding: 0 15px;
+        }
+
+        .instruction {
             text-align: center;
             font-size: 0.85rem;
             letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.85);
+            color: rgba(255, 255, 255, 0.9);
             text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
-            z-index: 10;
-            pointer-events: none;
             text-transform: uppercase;
+        }
+
+        .warning-instruction {
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fef08a;
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
+            background: rgba(20, 15, 35, 0.75);
+            padding: 6px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(234, 179, 8, 0.5);
+            backdrop-filter: blur(6px);
+            max-width: 90%;
         }
 
         /* Botón de control de audio en la esquina */
@@ -77,7 +99,7 @@
         /* Contenedor central flotante (Foto + Texto juntos) */
         .center-container {
             position: absolute;
-            top: 48%;
+            top: 52%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
@@ -93,14 +115,15 @@
 
         /* Marco de la imagen central */
         .center-card {
-            width: 220px;
-            height: 220px;
+            width: 200px;
+            height: 200px;
             border-radius: 20px;
             border: 2px solid #ffffff;
             box-shadow: 0 0 25px #ffffff, 0 0 50px rgba(255, 255, 255, 0.6);
             overflow: hidden;
             transition: all 0.3s ease;
             background-color: #030206;
+            flex-shrink: 0;
         }
 
         .center-card img {
@@ -117,15 +140,15 @@
 
         /* Texto Flotante */
         .floating-text {
-            margin-top: 18px;
-            font-size: 1.05rem;
+            margin-top: 14px;
+            font-size: 0.95rem;
             font-weight: 300;
             line-height: 1.6;
             color: #ffffff;
             text-align: center;
             width: 100%;
             padding: 16px 20px;
-            background: rgba(20, 15, 35, 0.75);
+            background: rgba(20, 15, 35, 0.85);
             border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
             backdrop-filter: blur(12px);
@@ -133,8 +156,9 @@
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
             box-shadow: 0 0 25px rgba(234, 179, 8, 0.3);
             animation: floatText 3s infinite ease-in-out;
-            max-height: 45vh;
+            max-height: 38vh;
             overflow-y: auto;
+            white-space: pre-line;
         }
 
         .center-container.final-stage .floating-text {
@@ -180,7 +204,11 @@
 </head>
 <body>
 
-    <div class="instruction">✨ Toca en cualquier parte para avanzar ✨</div>
+    <div class="instruction-container">
+        <div class="instruction">✨ TOCA EN CUALQUIER PARTE PARA AVANZAR ✨</div>
+        <div class="warning-instruction">⚠️ No tocar hasta terminar de leer y si cambia sin haber leído completo reinicia y no leas la siguiente</div>
+    </div>
+
     <div id="webgl"></div>
 
     <!-- Etiqueta de audio oculta -->
@@ -212,8 +240,12 @@
         const musicBtn = document.getElementById('musicBtn');
         let isMusicPlaying = false;
 
+        // Bajar el volumen por defecto al 30%
+        bgMusic.volume = 0.3;
+
         function loadAndPlaySong(index) {
             bgMusic.src = playlist[index];
+            bgMusic.volume = 0.3;
             bgMusic.play().then(() => {
                 musicBtn.innerText = '🎵';
                 isMusicPlaying = true;
@@ -236,6 +268,7 @@
                 if (!bgMusic.src || bgMusic.src === "" || bgMusic.src.endsWith("undefined")) {
                     loadAndPlaySong(currentSongIndex);
                 } else {
+                    bgMusic.volume = 0.3;
                     bgMusic.play().then(() => {
                         musicBtn.innerText = '🎵';
                         isMusicPlaying = true;
@@ -251,51 +284,51 @@
             toggleMusic();
         });
 
-        // --- 1. HISTORIA DE FOTOS Y MENSAJES ---
+        // --- 1. HISTORIA DE FOTOS Y MENSAJES (TEXTO EXACTO ORIGINAL) ---
         const history = [
             { 
-                text: "Hola mi amor, Feliz dia del amor y amistad, muchas gracias por todo enserio eres una mujer maravillosa, que ha pasado por muchas cosas en la vida y quedan muchas cosas mas pero te estoy muy agradecido por haber llegado a mi vida fuiste un bendicion me has ayudado en mucho, has estado para mi siempre que puedes y que necesito, me has demostrado tu amor de una forma maravillosa, intentas de todo porque esto salga bien. Muchas Gracias.", 
+                text: "Hola mi amor, feliz día de amor y amistad muchas gracias por todo en serio eres una mujer maravillosa que ha pasado por muchas cosas en la vida y que le quedan muchas más por recorrer y estoy muy agradecido por tu llegada a mi vida fuiste una gran bendición me has ayudado muchísimo has estado para mi siempre que lo he necesitado y me has demostrado tu amor de una forma increíble intentando de todo para que esto salga bien muchas gracias.", 
                 img: "foto1.jpeg" 
             },
             { 
-                text: "Y te quieria pedir perdon por todo lo que yo te he llegado a hacer pese a que eres una mujer maravillosa yo aveces puedo llegar a ser muy malo contigo, y se que los dos hemos cometido errores, pero mira que si yose que no es como deberia ser pero estoy muy agradecido porque apesar de todo me estoy dando cuenta poco a poco de lo que hago y que tengo que corregir entonces mejorare y seguire adelante contigo los dos. Te amo mucho muchote mi reina hermosa.", 
+                text: "Y te queria pedir perdon por todo lo que yo te he llegado a hacer pese a que eres una mujer maravillosa yo aveces puedo llegar a ser muy malo contigo, y se que los dos hemos cometido errores, pero mira que si yose que no es como deberia ser pero estoy muy agradecido porque apesar de todo me estoy dando cuenta poco a poco de lo que hago y que tengo que corregir entonces mejorare y seguire adelante contigo los dos. Te amo mucho muchote mi reina hermosa.", 
                 img: "foto2.jpeg" 
             },
             { 
-                text: "Y por eso mismo puede que antes no haya podido cambiar mucho por todos los lios en mi cabeza pero ya mas o menos entre en razon todavia me falta mucho y todavia tengo muchas cosas en la cabeza pero no quiero perderte, quiero seguir contigo para el resto de mi vida, salir adelante juntos, aprender y arreglar las cosas los dos, no estamos solos y si puede que haya mucha mas gente que nos apoye o con la que podamos hablar pero nuestros problemas son nuestros debermos hablar mas y solucionarlos los dos y se que yo soy el que mas le cuesta pero ya me estoy empezando a liberar un poco mas con el tema de hablar mis problemas y fue gracias a ti. Muchas Gracias", 
+                text: "Y tal vez antes no había podido cambiar mucho por todos los líos en mi cabeza pero ya he ido entrando en razón y si aún me falta camino y cosas pero no quiero perderte y quiero seguir contigo el resto de mi vida salir adelante los dos aprender y arreglar las cosas los dos y se que me cuesta hablar de mis problemas pero me he empezado a liberar un poco más gracias a ti muchas gracias.", 
                 img: "foto3.jpeg" 
             },
             { 
-                text: "Este es un pequeño detalle que estaba preparando hace mucho para este dia de amor y amistad puede que no sea la gran cosa pero mira que hace rato habia querido hacer algo asi de mi carrera pero no sabia puede que ya llevara mucho en mi carrera pero estos son cosas que no sabia pero con lo que fui aprendiendo y porque aun asi queria darte algo aprendi a hacerlo obvio no todo yo solo aprendi y meguie de videos hasta de la IA pero queria darte algo asi raro para este dia. Creo que cae un sabado talvez no podamos estar juntos del todo porque tengo clase y tu trabjas pero asi sean pequeños y cortos momentos los que estemos me alegras mucho la vida.", 
+                text: "Este es un pequeño detalle que te estaba haciendo para este día de amor y amistad desde hace tiempo, tal vez no sea la gran cosa pero te quería dar algo relacionado con mi carrera y lo aprendí a programar guiándome de videos e IA para darte algo diferente. Aunque hoy sea sábado y no podamos estar juntos por que tengo clase y trabajas esos cortos y pequeños momentos a tu lado alegras mi vida.", 
                 img: "foto4.jpeg" 
             },
             { 
-                text: "Pero mira como cambiaron las cosas nunca imagine que esto iba a pasar y ush que dolor pero aun asi no sabia si enviarte este mensaje pero nose no creo que este mal, todo lo que hice y te tenia es lo anterior entonces era con mucho amor que va y queria que lo tuvieras asi haya pasado todo lo que paso. IMPORTANTE YA DE AQUI EN ADELANTE ES MODIFICADO Y QUE AGREGUE DESPUES DE TODO ESTO ENTONCES NOSE SI QUIERAS LEERLO AHORITA PORQUE SUPONGO QUE LO LEERAS SOLA PORQUE YA QUE NO NOS VEMOS HOY PERO MAÑANA SI ENTONCES SI QUIERES LEE ESTO MAÑANA CUANDO ESTEMOS JUNTOS Y HABLEMOS UN RATO.", 
+                text: "No imaginé cómo cambiarían las cosas y dolor que se siente pero aun así te quería enviar este detalle, todo lo anterior lo hice con amor para ti, esto de aquí en adelante lo agregué después de todo lo que pasó, si gustas puedes leer esta parte con calma cuando estemos juntos y podamos hablar.", 
                 img: "foto5.jpeg" 
             },
             { 
-                text: "Sé que es difícil y puede no estar bien, pero perdón. No quiero dejar así las cosas, ya sé que tú dices que no se puede, pero no quiero. Esto no es para hacerte sentir mal ni nada, es solo un pequeño detalle que te quería dar. No será la gran cosa, pero es algo desde el fondo de mi corazón. Todos aquellos momentos que vivimos juntos, conocernos y enseñarnos, no quiero que nada de eso se acabe. Puede que ahorita las cosas no sean igual, pero entonces aprendamos otra vez y enseñémonos otra vez los dos. Puede ser egoísta de mi parte, pero no quiero que nada de esto se acabe: los pequeños y grandes detalles, las salidas y todo lo que llegamos a vivir juntos. Un viaje como este puede que no haya sido el mejor, pero fue una gran experiencia, nuestro primer viaje juntos, y quiero que hayan muchos más viajes así.", 
+                text: "Sé que es difícil pero perdón no quiero dejar así las cosas esto no es para que te sientas mal es solo un detalle desde mi corazón todos los momentos que vivimos conocernos y enseñarnos no quiero que se acabe aprendamos y enseñemos otra vez los dos, viajes salidas de experiencia hermosas quiero vivir más.", 
                 img: "foto6.jpeg" 
             },
             { 
-                text: "Yo sé que es difícil y como tú dices ya no me amas como antes, pero déjame demostrarte que los dos podemos mejorar y te volveré a enamorar día tras día. Puede que las cosas no vayan a ser iguales, ¿pero qué importa? Hagamos nuestra propia historia y lo más importante: estemos juntos, aprendamos más uno del otro y de la vida, mejoremos.", 
+                text: "Sé que han cambiado las cosas pero déjame demostrarte que los dos podemos cambiar te enamoraré día tras día, hagamos la propia historia aprendamos y mejoremos juntos.", 
                 img: "foto7.jpeg" 
             },
             { 
-                text: "Y te entediendo no te voy a pedir obviamente que no te ames a ti misma que esto es lo mejor para los dos y que es es por tu bien. Yo se que no e sido el mejor y no me voy a justificar por todo lo que hice la embarre feo y no tuve que ser asi nadie se merece que la traten asi no mas en el viaje lo que te hice esa noche no apoyarte no me voy a justificar pero estaba mal con lo que paso con lo de mis papas me sentia raro por que jhon estaba ahi y recorde mucho viajes pasados con mis papas y lo de mi tia nose aun asi no era para hacer lo que hice. Las veces que te trate mal o hable feo te pido perdon y creeme que no lo hacia de mala manera por los mismos problema estaba como cegado y por confianza era normal hablar asi. Obvio que no es normal y no mereces ese trato. Pero ya como que lo comprendi y queria cambiar y lo estaba intentando. Que la relacion se volvierq monotona fue mi culpa estaba tan bien contigo que me gustaba nose solo no mas estar contigo pero entiendo que no debe ser asi del todo toca salir y tengo que planear mas cosas. Los viajes que tuvimos fueron tan lindos a santa marta, cachipay todas las veces que fuimos, a guatavita, viajes con mi familia y cualquier salida contigo era feliz y todas los viajes que queria hacer al eje cafetero, a bojaca a vendecir las motos. ", 
+                text: "Entiendo completamente que te debes amar a ti misma, perdón por las veces que la cagué no me justifico el estrés o mis propios líos me cegaron y no te di el trato que te mereces pero entendí mis errores y los cambiaré. Los viajes a Santa Marta, Cachipay, Guatavita y las salidas con mi familia fue donde fui feliz, tengo el sueño de ir al eje cafetero, Bojacá a bendecir las motos y muchos lugares más.", 
                 img: "foto8.jpeg" 
             },
             { 
-                text: "Muchas cosas pero lastimosamente pensaba que neceistaba plata y no la tenia en esos momentos. Y nose no te estoy pidiendo que si enserio eras infeliz conmigo y no te haga feliz ya pues entiendo tu decisión pero yo no te puedo prometer que voy a cambiar asi y ya tan facil no va a ser facil y entiendo que no creas en mi promesas pero si quiero intentarlo quiero demostarte que te puedo amar mucho mas puede que no mas que tu pero lo intentare porque tu te amas demasiado y eso es lo que me encantaba de ti. Y pues como te digo puede que sonara canson y todo pero espero que pensaras bien las cosas, no se sentía que no podia ser asi sin mas y si yo se que esto viene desde antes y todo pero enserio que es lo que tu quieres que quiere ese corazon tan bello que tienes. Y no es que piensen los demas que opinas tu es lo importante porque a fin de cuentas somos los dos y nuestros problemas. Y si puede que ya hayamos terminado pero una parte de mi pensaba que no era real. No sé si esto te haga cambiar de opinión o si hayas logrado pensar bien las cosas, pero yo no quiero que esto quede así. No dejemos que acabe así. Puede que me hayas dicho que ya no lo quieres intentar por lo anterior, pero ¿enserio es lo que quieres?, ¿sí pensaste bien lo que tú querías?, ¿por qué no avanzar los dos y descubrir más cosas los dos? Te amo mucho muchote.", 
+                text: "Te prometo que voy a poner de mi parte para demostrar cuánto te amo, me encanta el amor propio que tienes quiero que lo pensemos bien y lo que diga tu corazón. No dejemos que esto acabe ¿Por qué no avanzar juntos y ver más cosas en la vida? Te amo mucho.", 
                 img: "foto9.jpeg" 
             },
             { 
-                text: "Y desde el fondo de mi corazón, puede que yo no sea el mejor hombre, novio y todo lo que pueda ser, pero nada es perfecto, solo tenemos que aprender y mejorar. Puede que no tenga el amor propio que necesito, pero es algo complicado y pues para un hombre es normal no tener casi amor propio, uno no quiere hacer las cosas por uno mismo, y sí, eso se puede cambiar, pero no es sencillo. Es más sencillo cuando uno cambia por alguien importante para uno y así ya este mejorando para mí mismo y empezará a mejorar más por mí mismo también quiero mejorar por ti. Entonces, déjame aprender a tu lado. No dire mas por aca entonces te lo dire yo mismo.", 
+                text: "Desde el fondo de mi corazón sé que no soy perfecto pero todos los días se aprende y se mejora. Quiero mejorar por mí y por ti, déjame aprender a tu lado. No diré más por aquí, el resto te lo diré yo mismo en persona.", 
                 img: null 
             }
         ];
 
-        // Precargar todas las imágenes para evitar demoras o bloqueos al cambiar
+        // Precargar imágenes
         history.forEach(item => {
             if (item.img) {
                 const imgPreload = new Image();
@@ -321,12 +354,10 @@
             textContent.innerText = currentItem.text;
         }
 
-        // Carga inicial
         updateContent();
 
         let isTransitioning = false;
         function advanceStory(e) {
-            // Evita que el toque sobre el botón de música cambie de foto
             if (e && (e.target === musicBtn || musicBtn.contains(e.target))) {
                 return;
             }
@@ -351,7 +382,6 @@
             }, 300);
         }
 
-        // Evento unificado universal para touch y mouse
         window.addEventListener('pointerdown', advanceStory);
 
         // --- 2. ESCENA 3D ---
@@ -421,7 +451,7 @@
         const galaxyPoints = createGalaxy();
         scene.add(galaxyPoints);
 
-        // --- 4. CREADOR DE TEXTURA DE GIRASOL REAL ---
+        // --- 4. CREADOR DE TEXTURAS ---
         function generateSunflowerTexture(type = 'sunflower') {
             const canvas = document.createElement('canvas');
             canvas.width = 512;
