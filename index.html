@@ -20,7 +20,6 @@
             color: #ffffff;
             user-select: none;
             -webkit-user-select: none;
-            touch-action: manipulation;
         }
 
         #webgl {
@@ -35,55 +34,46 @@
         /* Contenedor del indicador de ayuda superior */
         .instruction-container {
             position: absolute;
-            top: 12px;
+            top: 10px;
             width: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             z-index: 10;
             pointer-events: none;
             padding: 0 15px;
         }
 
-        .instruction {
-            text-align: center;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff;
-            text-transform: uppercase;
-        }
-
         .warning-instruction {
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 600;
             color: #fef08a;
             text-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
             background: rgba(20, 15, 35, 0.85);
-            padding: 5px 12px;
+            padding: 6px 14px;
             border-radius: 12px;
             border: 1px solid rgba(234, 179, 8, 0.5);
             backdrop-filter: blur(6px);
-            max-width: 92%;
+            max-width: 95%;
         }
 
-        /* Botón de control de audio en la esquina */
+        /* Botón de control de audio */
         .music-btn {
             position: absolute;
             bottom: 20px;
             right: 20px;
             z-index: 20;
-            background: rgba(20, 15, 35, 0.7);
+            background: rgba(20, 15, 35, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.4);
             border-radius: 50%;
-            width: 44px;
-            height: 44px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             color: #fff;
             cursor: pointer;
             backdrop-filter: blur(8px);
@@ -91,15 +81,44 @@
             transition: all 0.3s ease;
         }
 
-        .music-btn:hover {
-            transform: scale(1.1);
-            border-color: #fef08a;
+        .music-btn:active {
+            transform: scale(0.92);
+        }
+
+        /* Botón para avanzar el mensaje */
+        .next-btn {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 20;
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.9), rgba(202, 138, 4, 0.9));
+            border: 1px solid #fef08a;
+            border-radius: 25px;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: #000;
+            cursor: pointer;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.6);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .next-btn:active {
+            transform: translateX(-50%) scale(0.94);
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.8);
         }
 
         /* Contenedor central flotante (Foto + Texto juntos) */
         .center-container {
             position: absolute;
-            top: 53%;
+            top: 48%;
             left: 50%;
             transform: translate(-50%, -50%);
             display: flex;
@@ -107,16 +126,15 @@
             align-items: center;
             justify-content: center;
             z-index: 10;
-            pointer-events: none;
             transition: opacity 0.3s ease, transform 0.3s ease;
-            width: 90%;
-            max-width: 440px;
+            width: 92%;
+            max-width: 420px;
         }
 
         /* Marco de la imagen central */
         .center-card {
-            width: 170px;
-            height: 170px;
+            width: 150px;
+            height: 150px;
             border-radius: 20px;
             border: 2px solid #ffffff;
             box-shadow: 0 0 25px #ffffff, 0 0 40px rgba(255, 255, 255, 0.5);
@@ -124,7 +142,7 @@
             transition: all 0.3s ease;
             background-color: #030206;
             flex-shrink: 0;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .center-card img {
@@ -134,20 +152,19 @@
             display: block;
         }
 
-        /* Estilo cuando es la última escena (sin imagen central) */
         .center-container.final-stage .center-card {
             display: none;
         }
 
         /* Texto Flotante */
         .floating-text {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             font-weight: 300;
-            line-height: 1.55;
+            line-height: 1.5;
             color: #ffffff;
             text-align: center;
             width: 100%;
-            padding: 14px 18px;
+            padding: 14px 16px;
             background: rgba(20, 15, 35, 0.88);
             border: 1px solid rgba(255, 255, 255, 0.5);
             border-radius: 20px;
@@ -155,39 +172,39 @@
             -webkit-backdrop-filter: blur(12px);
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.5);
             box-shadow: 0 0 25px rgba(234, 179, 8, 0.3);
-            animation: floatText 3s infinite ease-in-out;
-            max-height: 48vh;
+            max-height: 42vh;
             overflow-y: auto;
-            pointer-events: auto; /* Permite scroll interactivo */
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-y;
         }
 
-        /* Barra de scroll estilizada */
+        /* Barra de scroll en móvil */
         .floating-text::-webkit-scrollbar {
-            width: 5px;
+            width: 4px;
         }
         .floating-text::-webkit-scrollbar-track {
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
         }
         .floating-text::-webkit-scrollbar-thumb {
-            background: rgba(254, 240, 138, 0.5);
+            background: rgba(254, 240, 138, 0.6);
             border-radius: 10px;
         }
 
         .center-container.final-stage .floating-text {
-            font-size: 1rem;
-            line-height: 1.65;
+            font-size: 0.95rem;
+            line-height: 1.6;
             color: #fef08a;
             border: 1px solid rgba(234, 179, 8, 0.8);
             box-shadow: 0 0 30px rgba(234, 179, 8, 0.5);
-            background: rgba(35, 25, 10, 0.9);
-            max-height: 70vh;
+            background: rgba(35, 25, 10, 0.92);
+            max-height: 65vh;
         }
 
         .heart-icon {
             display: none;
-            font-size: 1.8rem;
-            margin-bottom: 8px;
+            font-size: 1.6rem;
+            margin-bottom: 6px;
             text-align: center;
             filter: drop-shadow(0 0 10px rgba(234, 179, 8, 0.9));
             animation: heartbeat 2s infinite ease-in-out;
@@ -202,25 +219,19 @@
             50% { transform: scale(1.15); }
         }
 
-        @keyframes floatText {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-5px); }
-        }
-
         .fade-out {
             opacity: 0;
-            transform: translate(-50%, -55%) scale(0.9) !important;
+            transform: translate(-50%, -52%) scale(0.95) !important;
         }
     </style>
-    <!-- Librerías Three.js para la galaxia 3D -->
+    <!-- Librerías Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
     <div class="instruction-container">
-        <div class="instruction">✨ TOCA EN CUALQUIER PARTE PARA AVANZAR ✨</div>
-        <div class="warning-instruction">⚠️ No tocar hasta terminar de leer y si cambia sin haber leído completo reinicia y no leas la siguiente</div>
+        <div class="warning-instruction">⚠️ Desliza hacia abajo en el recuadro para leer todo y presiona "Siguiente" para cambiar de foto.</div>
     </div>
 
     <div id="webgl"></div>
@@ -231,7 +242,10 @@
     <!-- Botón para pausar/reproducir música -->
     <button class="music-btn" id="musicBtn" title="Activar/Desactivar música">🎵</button>
 
-    <!-- Contenedor central con la foto y su texto flotante integrados -->
+    <!-- Botón para cambiar de historia -->
+    <button class="next-btn" id="nextBtn">Siguiente ✨</button>
+
+    <!-- Contenedor central -->
     <div class="center-container" id="centerContainer">
         <div class="center-card" id="cardBox">
             <img id="mainImg" src="foto1.jpeg" alt="Foto de recuerdo">
@@ -243,7 +257,7 @@
     </div>
 
     <script>
-        // --- CONTROL DE REPRODUCCIÓN CONTINUA DE LAS DOS CANCIONES ---
+        // --- CONTROL DE REPRODUCCIÓN CONTINUA DE CANCIONES ---
         const playlist = [
             "faltas_tu.mp3",
             "porfa_no_te_vayas.mp3"
@@ -252,6 +266,7 @@
 
         const bgMusic = document.getElementById('bgMusic');
         const musicBtn = document.getElementById('musicBtn');
+        const nextBtn = document.getElementById('nextBtn');
         let isMusicPlaying = false;
 
         bgMusic.volume = 0.3;
@@ -292,12 +307,12 @@
             }
         }
 
-        musicBtn.addEventListener('pointerdown', (e) => {
+        musicBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleMusic();
         });
 
-        // --- 1. HISTORIA DE FOTOS Y MENSAJES (TEXTO EXACTO Y COMPLETO) ---
+        // --- HISTORIA DE FOTOS Y MENSAJES ---
         const history = [
             { 
                 text: "Hola mi amor, Feliz dia del amor y amistad, muchas gracias por todo enserio eres una mujer maravillosa, que ha pasado por muchas cosas en la vida y quedan muchas cosas mas pero te estoy muy agradecido por haber llegado a mi vida fuiste un bendicion me has ayudado en mucho, has estado para mi siempre que puedes y que necesito, me has demostrado tu amor de una forma maravillosa, intentas de todo porque esto salga bien. Muchas Gracias.", 
@@ -366,18 +381,13 @@
             }
             
             textContent.innerText = currentItem.text;
-            mainText.scrollTop = 0; // Reiniciar scroll arriba en cada cambio
+            mainText.scrollTop = 0;
         }
 
         updateContent();
 
         let isTransitioning = false;
-        function advanceStory(e) {
-            // Evita cambiar de diapositiva al interactuar con el botón de música
-            if (e && (e.target === musicBtn || musicBtn.contains(e.target))) {
-                return;
-            }
-
+        function advanceStory() {
             if (isTransitioning) return;
             isTransitioning = true;
 
@@ -398,9 +408,10 @@
             }, 300);
         }
 
-        window.addEventListener('pointerdown', advanceStory);
+        // Cambio exclusivo mediante botón "Siguiente"
+        nextBtn.addEventListener('click', advanceStory);
 
-        // --- 2. ESCENA 3D ---
+        // --- ESCENA 3D DE FONDO ---
         const scene = new THREE.Scene();
         scene.fog = new THREE.FogExp2(0x030206, 0.012);
 
@@ -417,9 +428,9 @@
         controls.dampingFactor = 0.05;
         controls.enableZoom = false;
 
-        // --- 3. GALAXIA DE ESTRELLAS CÁLIDAS ---
+        // --- GALAXIA ---
         function createGalaxy() {
-            const count = 6500;
+            const count = 5500;
             const geometry = new THREE.BufferGeometry();
             const positions = new Float32Array(count * 3);
             const colors = new Float32Array(count * 3);
@@ -467,7 +478,7 @@
         const galaxyPoints = createGalaxy();
         scene.add(galaxyPoints);
 
-        // --- 4. CREADOR DE TEXTURAS ---
+        // --- CREADOR DE TEXTURAS ---
         function generateSunflowerTexture(type = 'sunflower') {
             const canvas = document.createElement('canvas');
             canvas.width = 512;
@@ -554,7 +565,7 @@
             return new THREE.CanvasTexture(canvas);
         }
 
-        // --- 5. AÑADIR GIRASOLES Y FLORES EN ÓRBITA ---
+        // --- GIRASOLES EN ÓRBITA ---
         const groupPhotos = new THREE.Group();
         scene.add(groupPhotos);
 
@@ -589,7 +600,7 @@
             photoMeshes.push(mesh);
         }
 
-        // --- 6. ANIMACIÓN ---
+        // --- ANIMACIÓN ---
         function animate() {
             requestAnimationFrame(animate);
 
